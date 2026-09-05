@@ -77,7 +77,7 @@ export function createProductCard() {
 }
 
 export function createBookingLiffCard() {
-  const liffUrl = `line://app/${process.env.LIFF_ID || '2010630162-RcvmhD79'}`;
+  const liffUrl = `https://liff.line.me/${process.env.LIFF_ID || '2010630162-RcvmhD79'}`;
   return {
     type: 'flex',
     altText: 'จองแพ็กเกจทัวร์ Sealy Trip',
