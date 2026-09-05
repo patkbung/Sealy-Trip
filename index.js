@@ -160,4 +160,10 @@ if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   });
 }
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default app;
