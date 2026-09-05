@@ -11,13 +11,24 @@ let sessionClient;
 let projectId;
 
 try {
-  const credentials = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+  let credentials;
+  if (process.env.DIALOGFLOW_CREDENTIALS) {
+    // ใช้งานบน Vercel โดยตั้งค่าผ่าน Environment Variables
+    credentials = JSON.parse(process.env.DIALOGFLOW_CREDENTIALS);
+  } else if (fs.existsSync(keyPath)) {
+    // ใช้งานแบบ Local 
+    credentials = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+  } else {
+    throw new Error('No credentials found in DIALOGFLOW_CREDENTIALS or dialogflow-key.json');
+  }
+
   projectId = credentials.project_id;
   
   sessionClient = new dialogflow.SessionsClient({
+    projectId: projectId,
     credentials: {
       client_email: credentials.client_email,
-      private_key: credentials.private_key,
+      private_key: credentials.private_key, // รองรับ \n จาก JSON แบบปกติ
     },
   });
   console.log('[Dialogflow] Service initialized successfully with project:', projectId);
