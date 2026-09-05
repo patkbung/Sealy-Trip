@@ -1,0 +1,174 @@
+{
+  "name": "LINE-Chatbot-Workflow-Native-Gemini-With-Loading-And-Quote",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "line-chatbot",
+        "options": {}
+      },
+      "id": "webhook-node-id",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.events[0].message.type }}",
+              "value2": "text"
+            }
+          ]
+        }
+      },
+      "id": "if-node-id",
+      "name": "If (Text or Sticker?)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/chat/loading/start",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer 4vsI8wYR2/WgYJnP65vZ3AENI13d4+W7tIPPhhPpW4HzHMqS3e0DthE8U8ZpNF4QfPuinKwYZY79hT1Q3CoTq711btwXcStt7kRIgdihLEfSdTSFSNxbHay1uY6EGYzlUuiogXXkokfexyIR56q7jgdB04t89/1O/w1cDnyilFU=\"}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"chatId\": $('Webhook1').item.json.body.events[0].source.userId, \"loadingSeconds\": 20 } }}"
+      },
+      "id": "loading-node-id",
+      "name": "HTTP: Show Loading",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        680,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=YOUR_GEMINI_API_KEY",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\"Content-Type\":\"application/json\"}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"contents\": [ { \"parts\": [ { \"text\": $('Webhook1').item.json.body.events[0].message.text } ] } ] } }}"
+      },
+      "id": "gemini-api-id",
+      "name": "HTTP: Call Gemini API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        900,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer 4vsI8wYR2/WgYJnP65vZ3AENI13d4+W7tIPPhhPpW4HzHMqS3e0DthE8U8ZpNF4QfPuinKwYZY79hT1Q3CoTq711btwXcStt7kRIgdihLEfSdTSFSNxbHay1uY6EGYzlUuiogXXkokfexyIR56q7jgdB04t89/1O/w1cDnyilFU=\"}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"replyToken\": $('Webhook1').item.json.body.events[0].replyToken, \"messages\": [ { \"type\": \"text\", \"text\": $json.candidates[0].content.parts[0].text, \"quoteToken\": $('Webhook1').item.json.body.events[0].message.quoteToken } ] } }}"
+      },
+      "id": "reply-line-id",
+      "name": "HTTP: Reply LINE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer 4vsI8wYR2/WgYJnP65vZ3AENI13d4+W7tIPPhhPpW4HzHMqS3e0DthE8U8ZpNF4QfPuinKwYZY79hT1Q3CoTq711btwXcStt7kRIgdihLEfSdTSFSNxbHay1uY6EGYzlUuiogXXkokfexyIR56q7jgdB04t89/1O/w1cDnyilFU=\"}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"replyToken\": $('Webhook1').item.json.body.events[0].replyToken, \"messages\": [ { \"type\": \"text\", \"text\": \"รองรับเฉพาะข้อความเท่านั้น\", \"quoteToken\": $('Webhook1').item.json.body.events[0].message.quoteToken } ] } }}"
+      },
+      "id": "reply-sticker-id",
+      "name": "HTTP: Reply Sticker Fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        680,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "If (Text or Sticker?)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If (Text or Sticker?)": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Show Loading",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP: Reply Sticker Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Show Loading": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Call Gemini API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Call Gemini API": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Reply LINE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true
+}

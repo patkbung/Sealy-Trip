@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>จองแพ็กเกจทัวร์ — Sealy Trip</title>
+  <!-- Google Fonts: Outfit for English & Prompt for Thai -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Prompt:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="booking_style.css">
+</head>
+
+<body>
+  <div class="background-decor circle-1"></div>
+  <div class="background-decor circle-2"></div>
+
+  <div class="container">
+    <!-- User Profile Header -->
+    <header class="profile-header">
+      <div class="avatar-container">
+        <img id="user-avatar" src="https://via.placeholder.com/60" alt="Profile Picture">
+        <div class="status-dot"></div>
+      </div>
+      <div class="user-info">
+        <h2 id="user-name">กำลังโหลดโปรไฟล์...</h2>
+        <p class="subtitle">แพลนการเดินทางสุดพิเศษของคุณกับ Sealy Trip</p>
+      </div>
+    </header>
+
+    <!-- Main Booking Form -->
+    <main class="booking-card">
+      <h1 class="card-title">🏖️ ใบจองแพ็กเกจทัวร์</h1>
+      <p class="card-desc">กรุณากรอกข้อมูลการเดินทางเพื่อประเมินราคารับส่วนลดพิเศษ</p>
+
+      <form id="booking-form">
+        <!-- 1. Destination Select -->
+        <div class="form-group">
+          <label for="destination" class="label-title">🏝️ เลือกจุดหมายปลายทาง</label>
+          <div class="select-wrapper">
+            <select id="destination" required>
+              <option value="" disabled selected>กรุณาเลือกเกาะที่คุณต้องการไป...</option>
+              <option value="pp" data-price="1500">เกาะพีพี จ.กระบี่ (1,500 บาท/ท่าน)</option>
+              <option value="similan" data-price="2500">หมู่เกาะสิมิลัน จ.พังงา (2,500 บาท/ท่าน)</option>
+              <option value="lipe" data-price="3500">เกาะหลีเป๊ะ จ.สตูล (3,500 บาท/ท่าน)</option>
+              <option value="samui" data-price="2900">เกาะสมุย จ.สุราษฎร์ธานี (2,900 บาท/ท่าน)</option>
+              <option value="phangan" data-price="2900">เกาะพะงัน จ.สุราษฎร์ธานี (2,900 บาท/ท่าน)</option>
+              <option value="tao" data-price="3200">เกาะเต่า จ.สุราษฎร์ธานี (3,200 บาท/ท่าน)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 2. Travel Date -->
+        <div class="form-group">
+          <label for="travel-date" class="label-title">📅 วันที่เริ่มเดินทาง</label>
+          <input type="date" id="travel-date" required>
+          <span id="date-error" class="text-error hidden">⚠️ กรุณาเลือกวันเดินทางล่วงหน้าอย่างน้อย 3 วัน</span>
+        </div>
+
+        <!-- 3. Travelers count (Adults, Children) -->
+        <div class="form-group">
+          <label class="label-title">👨‍👩‍👧‍👦 จำนวนผู้เดินทาง</label>
+          <div class="travelers-row">
+            <!-- Adults -->
+            <div class="traveler-selector">
+              <span class="selector-label">ผู้ใหญ่ (12 ปีขึ้นไป)</span>
+              <div class="spinner-control">
+                <button type="button" class="btn-spinner" onclick="decrement('adults')">−</button>
+                <input type="number" id="adults" value="1" min="1" max="50" readonly>
+                <button type="button" class="btn-spinner" onclick="increment('adults')">+</button>
+              </div>
+            </div>
+            <!-- Children -->
+            <div class="traveler-selector">
+              <span class="selector-label">เด็ก (อายุ 2-11 ปี)</span>
+              <div class="spinner-control">
+                <button type="button" class="btn-spinner" onclick="decrement('children')">−</button>
+                <input type="number" id="children" value="0" min="0" max="50" readonly>
+                <button type="button" class="btn-spinner" onclick="increment('children')">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Special Needs Toggle -->
+        <div class="form-group special-needs-section">
+          <div class="toggle-control">
+            <span class="label-title toggle-label">♿ ต้องการการดูแลเป็นพิเศษ</span>
+            <label class="switch">
+              <input type="checkbox" id="has-special-needs" onchange="toggleSpecialNeedsDetail()">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <p class="section-hint">สำหรับผู้สูงอายุ ผู้พิการ หญิงตั้งครรภ์ หรือผู้ที่ต้องการวีลแชร์</p>
+          <div id="special-needs-detail-container" class="detail-input-container hidden">
+            <textarea id="special-needs-detail"
+              placeholder="ระบุข้อมูลการดูแลเป็นพิเศษ เช่น ต้องการวีลแชร์, มีผู้สูงอายุเดินช้า ฯลฯ" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- 5. Promotions Selector -->
+        <div class="form-group">
+          <label class="label-title">🎁 โปรโมชันที่สามารถเลือกใช้ได้</label>
+          <div class="promotions-list">
+            <!-- No Promo Option -->
+            <label class="promo-card active" id="card-promo-none">
+              <input type="radio" name="promo" value="none" checked onchange="calculatePrice()">
+              <div class="promo-info">
+                <span class="promo-name">ไม่ใช้โปรโมชัน</span>
+                <span class="promo-desc">คิดราคาปกติเต็มจำนวน</span>
+              </div>
+            </label>
+
+            <!-- Couple Promo Option -->
+            <label class="promo-card disabled" id="card-promo-couple">
+              <input type="radio" name="promo" value="couple" disabled onchange="calculatePrice()">
+              <div class="promo-info">
+                <div class="promo-badge-container">
+                  <span class="promo-name">💕 โปรคู่รัก</span>
+                  <span class="status-badge" id="badge-couple">ไม่ตรงเงื่อนไข</span>
+                </div>
+                <span class="promo-desc">จอง 2 ท่าน รับส่วนลด 10% (เฉพาะ พีพี, สิมิลัน, หลีเป๊ะ ในเดือนนี้)</span>
+              </div>
+            </label>
+
+            <!-- Group Promo Option -->
+            <label class="promo-card disabled" id="card-promo-group">
+              <input type="radio" name="promo" value="group" disabled onchange="calculatePrice()">
+              <div class="promo-info">
+                <div class="promo-badge-container">
+                  <span class="promo-name">👨‍👩‍👧‍👦 โปรมาเป็นกลุ่ม</span>
+                  <span class="status-badge" id="badge-group">ไม่ตรงเงื่อนไข</span>
+                </div>
+                <span class="promo-desc">จองตั้งแต่ 5 ท่านขึ้นไป รับส่วนลด 15% (ทุกเกาะ)</span>
+              </div>
+            </label>
+
+            <!-- Birthday Promo Option -->
+            <label class="promo-card disabled" id="card-promo-birthday">
+              <input type="radio" name="promo" value="birthday" disabled onchange="calculatePrice()">
+              <div class="promo-info">
+                <div class="promo-badge-container">
+                  <span class="promo-name">🎂 โปรวันเกิด</span>
+                  <span class="status-badge" id="badge-birthday">ไม่ตรงเงื่อนไข</span>
+                </div>
+                <span class="promo-desc">ลด 1,000 บาททันที (เฉพาะ พีพี, สิมิลัน, หลีเป๊ะ
+                  *ต้องรอแอดมินยืนยันสิทธิ์)</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 6. Payment Information -->
+        <div class="form-group">
+          <label class="label-title">💳 ช่องทางการชำระเงิน (โอนผ่านธนาคาร)</label>
+          <div class="bank-details-card">
+            <div class="bank-header">
+              <span class="bank-icon">🏦</span>
+              <span class="bank-name">ธนาคารกสิกรไทย (K-Bank)</span>
+            </div>
+            <div class="account-number-row">
+              <span class="account-number" id="acc-number">123-4-56789-0</span>
+              <button type="button" class="btn-copy" onclick="copyAccountNumber()">📋 คัดลอกเลขบัญชี</button>
+            </div>
+            <div class="account-name-row">
+              <span class="account-name">ชื่อบัญชี: บจก. ซีลี่ ทริป ทราเวล</span>
+            </div>
+          </div>
+          <p class="section-hint text-warning">
+            ⚠️ <b>โอนเงินเรียบร้อยแล้ว?</b> กรุณากดปุ่มส่งจองด้านล่างนี้ และ<b>แนบภาพสลิปโอนเงินเข้ามาในห้องแชท LINE
+              นี้ทันที</b> เพื่อออกตั๋วครับ
+          </p>
+        </div>
+
+        <!-- QR Code / Promo Coupon Scanner Section -->
+        <div class="form-group">
+          <label class="label-title">🎟️ โค้ดส่วนลดพิเศษ (QR Code / Coupon)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="coupon-code" class="form-control" placeholder="กรอกโค้ด หรือสแกน QR เพื่อรับส่วนลด" style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #ccc; border-radius: 8px;" oninput="applyCoupon()">
+            <button type="button" id="scan-qr-btn" class="btn" style="background: #0d2f56; color: #fff; border: none; padding: 0 15px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: 'Prompt', sans-serif;" onclick="scanPromoQr()">
+              📷 สแกน QR
+            </button>
+          </div>
+          <p class="section-hint" id="coupon-status" style="color: #666; font-size: 0.85rem; margin-top: 5px;"></p>
+        </div>
+
+        <!-- 6. Pricing Summary -->
+        <div class="price-summary-card">
+          <div class="price-row">
+            <span>ราคาปกติ (<span id="total-guests-label">1</span> ท่าน)</span>
+            <span id="price-base">฿0</span>
+          </div>
+          <div class="price-row discount-row hidden" id="discount-container">
+            <span id="applied-promo-label">ส่วนลด</span>
+            <span id="price-discount" class="text-green">-฿0</span>
+          </div>
+          <hr class="price-divider">
+          <div class="price-row total-row">
+            <span>ยอดชำระสุทธิ</span>
+            <span id="price-total" class="text-primary">฿0</span>
+          </div>
+          <p class="birthday-notice hidden" id="birthday-warning">
+            ⚠️ *โปรวันเกิดจะคิดราคาส่วนลดให้เบื้องต้น กรุณารอแอดมินตรวจสอบบัตรประชาชนในห้องแชทเพื่ออนุมัติสิทธิ์อีกครั้ง
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 100%;">
+          <button type="submit" id="submit-btn" class="btn-submit" style="margin: 0; width: 100%;">
+            <span>🏝️ ยืนยันการจองแพ็กเกจ</span>
+          </button>
+          <button type="button" id="share-btn" class="btn" style="background: transparent; color: #0d2f56; border: 2px solid #0d2f56; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; width: 100%; transition: background-color 0.2s; font-family: 'Prompt', sans-serif;" onclick="shareTourToFriends()">
+            👥 แชร์แพ็กเกจทัวร์นี้ให้เพื่อน
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <!-- Footer Credits -->
+    <footer class="main-footer">
+      <p>© 2026 Sealy Trip Co., Ltd. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <!-- LINE LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- Configuration & Logic -->
+  <script src="/config.js"></script>
+  <script src="booking.js"></script>
+</body>
+
+</html>
