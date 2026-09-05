@@ -20,7 +20,7 @@ const app = express();
 
 // LINE Webhook route must be registered BEFORE any body-parser middlewares like express.json()
 // to preserve the raw request body for signature verification.
-app.post('/callback', line.middleware(lineConfig), async (req, res) => {
+app.post(['/callback', '/index.js', '/'], line.middleware(lineConfig), async (req, res) => {
   try {
     await processEvents(client, req.body.events);
     res.status(200).end();
