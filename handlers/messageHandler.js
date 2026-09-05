@@ -34,6 +34,7 @@ const COMMANDS = {
     },
   ],
   จองทัวร์: () => [createBookingLiffCard()],
+  จองแพ็กเกจทัวร์: () => [createBookingLiffCard()],
   'จอง One Day Trip': () => [createBookingLiffCard()],
   'จอง 2 วัน 1 คืน': () => [createBookingLiffCard()],
   'จอง 3 วัน 2 คืน': () => [createBookingLiffCard()],
